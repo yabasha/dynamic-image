@@ -18,5 +18,8 @@
             ]
         }
     },
-    "license": "MIT"
+    "license": "MIT",
+    "archive": {
+        "exclude": []
+    }
 }
