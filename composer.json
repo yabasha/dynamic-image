@@ -1,0 +1,22 @@
+{
+    "name": "yabasha/dynamic-image",
+    "description": "Dynamic image helper for Laravel.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Yabasha\\DynamicImage\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Yabasha\\DynamicImage\\DynamicImageServiceProvider"
+            ]
+        }
+    },
+    "license": "MIT"
+}
