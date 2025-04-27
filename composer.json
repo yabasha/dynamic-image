@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "Yabasha\\DynamicImage\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "require": {
         "php": ">=7.4",
