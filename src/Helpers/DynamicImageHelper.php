@@ -31,25 +31,43 @@ class DynamicImageHelper
         return $images;
     }
 
-    public function randomImage()
+    /**
+     * Get a random image.
+     * @param bool $asUrl If true (default), return a URL. If false, return the relative path.
+     * @return string|null
+     */
+    public function randomImage($asUrl = true)
     {
         $images = $this->getAllImages();
         if (empty($images)) {
-            return $this->defaultImage ? Storage::url($this->defaultImage) : null;
+            if ($this->defaultImage) {
+                return $asUrl ? Storage::url($this->defaultImage) : $this->defaultImage;
+            }
+            return null;
         }
         $randomImage = $images[array_rand($images)];
-        return Storage::url($randomImage);
+        return $asUrl ? Storage::url($randomImage) : $randomImage;
     }
 
-    public function timedImage($intervalMinutes = 10, $now = null)
+    /**
+     * Get an image based on time interval.
+     * @param int $intervalMinutes
+     * @param \DateTimeInterface|null $now
+     * @param bool $asUrl If true (default), return a URL. If false, return the relative path.
+     * @return string|null
+     */
+    public function timedImage($intervalMinutes = 10, $now = null, $asUrl = true)
     {
         $images = $this->getAllImages();
         if (empty($images)) {
-            return $this->defaultImage ? Storage::url($this->defaultImage) : null;
+            if ($this->defaultImage) {
+                return $asUrl ? Storage::url($this->defaultImage) : $this->defaultImage;
+            }
+            return null;
         }
         $now = $now ?: now();
         $minutes = floor($now->timestamp / ($intervalMinutes * 60));
         $index = $minutes % count($images);
-        return Storage::url($images[$index]);
+        return $asUrl ? Storage::url($images[$index]) : $images[$index];
     }
 }
