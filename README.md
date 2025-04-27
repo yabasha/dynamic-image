@@ -4,11 +4,12 @@ Easily display dynamic images on your login page from one or more folders in sto
 
 ## Installation
 
-1. Add the package to your `composer.json` (path repository) and run `composer require yabasha/dynamicimage`.
-2. Publish the config:
+1. Add the package to your `composer.json` (path repository) and run `composer require yabasha/dynamic-image`.
+2. **Publish the config file to your Laravel app:**
    ```bash
    php artisan vendor:publish --provider="Yabasha\\DynamicImage\\DynamicImageServiceProvider" --tag=config
    ```
+   This copies the config file from `vendor/yabasha/dynamic-image/config/dynamicimage.php` to your application's `config/dynamicimage.php`.
 3. Configure `config/dynamicimage.php` with your folders and settings.
 
 ## Usage
