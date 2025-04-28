@@ -30,7 +30,26 @@ if (!function_exists('dynamic_image')) {
             $path = $helper->randomImage($asUrl);
         }
         if ($options && is_string($path)) {
-            $path = preg_replace('#^([^/]+/)#', '$1' . $options . '/', $path, 1);
+            // If absolute URL, parse and insert options after disk root in the path
+            if (filter_var($path, FILTER_VALIDATE_URL)) {
+                $parts = parse_url($path);
+                if (isset($parts['path'])) {
+                    // Insert options after disk root
+                    $diskRoot = trim($resolvedDisk, '/');
+                    $pattern = '#^(/?' . preg_quote($diskRoot, '#') . '/)#';
+                    $parts['path'] = preg_replace($pattern, '$1' . $options . '/', $parts['path'], 1);
+                    // Rebuild URL
+                    $rebuilt = $parts['scheme'] . '://' . $parts['host'];
+                    if (isset($parts['port'])) $rebuilt .= ':' . $parts['port'];
+                    $rebuilt .= $parts['path'];
+                    if (isset($parts['query'])) $rebuilt .= '?' . $parts['query'];
+                    if (isset($parts['fragment'])) $rebuilt .= '#' . $parts['fragment'];
+                    $path = $rebuilt;
+                }
+            } else {
+                // Relative path: insert after first segment
+                $path = preg_replace('#^([^/]+/)#', '$1' . $options . '/', $path, 1);
+            }
         }
         return $path;
     }
