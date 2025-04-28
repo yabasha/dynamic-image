@@ -12,7 +12,7 @@ if (!function_exists('dynamic_image')) {
      * @param null $disk
      * @return string|null
      */
-    function dynamic_image(?string $mode = null, bool $asUrl = true, string $options = null, $disk = null): ?string
+    function dynamic_image(?string $mode = null, bool $asUrl = true, ?string $options = null, $disk = null): ?string
     {
         $config = config('dynamicimage');
         // Determine which disk to use (passed in or from config)
