@@ -14,7 +14,12 @@ class DynamicImageHelper
 
     public function __construct(array $folders, array $extensions, $defaultImage = null, $disk = 'public')
     {
-        $this->folders = $folders;
+        // Normalize folder paths to be relative to the disk root
+        $this->folders = array_map(function($folder) {
+            // Remove common prefixes
+            $folder = preg_replace('#^(storage/app/public/|app/public/|storage/app/)#', '', $folder);
+            return ltrim($folder, '/');
+        }, $folders);
         $this->extensions = $extensions;
         $this->defaultImage = $defaultImage;
         $this->disk = $disk ?: 'public';
