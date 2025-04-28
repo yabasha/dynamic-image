@@ -66,7 +66,7 @@ class DynamicImageHelper
      * @param bool $asUrl If true (default), return a URL. If false, return the relative path.
      * @return string|null
      */
-    public function timedImage(int $intervalMinutes = 10, DateTimeInterface $now = null, bool $asUrl = true): ?string
+    public function timedImage(int $intervalMinutes = 10, ?DateTimeInterface $now = null, bool $asUrl = true): ?string
     {
         $images = $this->getAllImages();
         if (empty($images)) {
