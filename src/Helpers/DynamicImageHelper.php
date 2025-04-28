@@ -1,26 +1,30 @@
 <?php
 namespace Yabasha\DynamicImage\Helpers;
 
+use DateTimeInterface;
 use Illuminate\Support\Facades\Storage;
 
 class DynamicImageHelper
 {
-    protected $folders;
-    protected $extensions;
+    protected array $folders;
+    protected array $extensions;
     protected $defaultImage;
+    protected $disk;
 
-    public function __construct(array $folders, array $extensions, $defaultImage = null)
+    public function __construct(array $folders, array $extensions, $defaultImage = null, $disk = 'public')
     {
         $this->folders = $folders;
         $this->extensions = $extensions;
         $this->defaultImage = $defaultImage;
+        $this->disk = $disk ?: 'public';
     }
 
-    protected function getAllImages()
+    protected function getAllImages(): array
     {
         $images = [];
+        $storage = $this->getStorage();
         foreach ($this->folders as $folder) {
-            $files = Storage::files($folder);
+            $files = $storage->files($folder);
             foreach ($files as $file) {
                 $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
                 if (in_array($ext, $this->extensions)) {
@@ -31,43 +35,48 @@ class DynamicImageHelper
         return $images;
     }
 
+    protected function getStorage()
+    {
+        return \Illuminate\Support\Facades\Storage::disk($this->disk);
+    }
+
     /**
      * Get a random image.
      * @param bool $asUrl If true (default), return a URL. If false, return the relative path.
      * @return string|null
      */
-    public function randomImage($asUrl = true)
+    public function randomImage(bool $asUrl = true): ?string
     {
         $images = $this->getAllImages();
         if (empty($images)) {
             if ($this->defaultImage) {
-                return $asUrl ? Storage::url($this->defaultImage) : $this->defaultImage;
+                return $asUrl ? $this->getStorage()->url($this->defaultImage) : $this->defaultImage;
             }
             return null;
         }
         $randomImage = $images[array_rand($images)];
-        return $asUrl ? Storage::url($randomImage) : $randomImage;
+        return $asUrl ? $this->getStorage()->url($randomImage) : $randomImage;
     }
 
     /**
      * Get an image based on time interval.
      * @param int $intervalMinutes
-     * @param \DateTimeInterface|null $now
+     * @param DateTimeInterface|null $now
      * @param bool $asUrl If true (default), return a URL. If false, return the relative path.
      * @return string|null
      */
-    public function timedImage($intervalMinutes = 10, $now = null, $asUrl = true)
+    public function timedImage(int $intervalMinutes = 10, DateTimeInterface $now = null, bool $asUrl = true): ?string
     {
         $images = $this->getAllImages();
         if (empty($images)) {
             if ($this->defaultImage) {
-                return $asUrl ? Storage::url($this->defaultImage) : $this->defaultImage;
+                return $asUrl ? $this->getStorage()->url($this->defaultImage) : $this->defaultImage;
             }
             return null;
         }
         $now = $now ?: now();
         $minutes = floor($now->timestamp / ($intervalMinutes * 60));
         $index = $minutes % count($images);
-        return $asUrl ? Storage::url($images[$index]) : $images[$index];
+        return $asUrl ? $this->getStorage()->url($images[$index]) : $images[$index];
     }
 }

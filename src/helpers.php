@@ -8,23 +8,20 @@ if (!function_exists('dynamic_image')) {
      *
      * @param string|null $mode 'random' or 'timed'
      * @param bool $asUrl If true (default), returns a URL. If false, returns the relative path.
-     * @return string|null
-     */
-    /**
-     * Get a dynamic image path or URL.
-     *
-     * @param string|null $mode 'random' or 'timed'
-     * @param bool $asUrl If true (default), returns a URL. If false, returns the relative path.
      * @param string|null $options If set and $asUrl is false, inserts options after the top folder (e.g., images/OPTIONS/...)
+     * @param null $disk
      * @return string|null
      */
-    function dynamic_image($mode = null, $asUrl = true, $options = null)
+    function dynamic_image(string $mode = null, bool $asUrl = true, string $options = null, $disk = null): ?string
     {
         $config = config('dynamicimage');
+        // Determine which disk to use (passed in or from config)
+        $resolvedDisk = $disk ?: ($config['disk'] ?? 'public');
         $helper = new DynamicImageHelper(
             $config['folders'] ?? [],
             $config['extensions'] ?? [],
-            $config['default_image'] ?? null
+            $config['default_image'] ?? null,
+            $resolvedDisk
         );
         $mode = $mode ?: ($config['mode'] ?? 'random');
         if ($mode === 'timed') {
@@ -32,14 +29,8 @@ if (!function_exists('dynamic_image')) {
         } else {
             $path = $helper->randomImage($asUrl);
         }
-        // Insert options if needed
         if ($options && is_string($path)) {
-            // Insert after the first folder segment (e.g., images/OPTIONS/rest/of/path)
             $path = preg_replace('#^([^/]+/)#', '$1' . $options . '/', $path, 1);
-        }
-        // If $asUrl is true, return as asset() URL
-        if ($asUrl && is_string($path)) {
-            return asset($path);
         }
         return $path;
     }

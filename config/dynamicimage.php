@@ -7,4 +7,5 @@ return [
     'interval_minutes' => 10,
     'mode' => 'random', // or 'timed'
     'default_image' => null, // e.g. 'app/public/default.jpg'
+    'disk' => 'public', // specify the filesystem disk used by dynamic_image
 ];
