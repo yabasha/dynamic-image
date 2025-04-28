@@ -2,6 +2,7 @@
 namespace Yabasha\DynamicImage\Helpers;
 
 use DateTimeInterface;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 class DynamicImageHelper
@@ -35,9 +36,9 @@ class DynamicImageHelper
         return $images;
     }
 
-    protected function getStorage()
+    protected function getStorage(): Filesystem
     {
-        return \Illuminate\Support\Facades\Storage::disk($this->disk);
+        return Storage::disk($this->disk);
     }
 
     /**
@@ -74,8 +75,12 @@ class DynamicImageHelper
             }
             return null;
         }
-        $now = $now ?: now();
-        $minutes = floor($now->timestamp / ($intervalMinutes * 60));
+        $now = $now ?: (function_exists('now') ? now() : null);
+        if (!$now instanceof \DateTimeInterface) {
+            trigger_error('timedImage: $now is null or not a valid DateTimeInterface', E_USER_WARNING);
+            return null;
+        }
+        $minutes = floor($now->getTimestamp() / ($intervalMinutes * 60));
         $index = $minutes % count($images);
         return $asUrl ? $this->getStorage()->url($images[$index]) : $images[$index];
     }
