@@ -22,6 +22,10 @@ In your Blade view:
 <img src="{{ dynamic_image(null, true, 'compress,width=1200,blur=5') }}" alt="Custom Art">
 <!-- Use a custom disk: -->
 <img src="{{ dynamic_image(null, true, null, 's3') }}" alt="Art from S3">
+<!-- Get an image from a specific folder (relative to disk root): -->
+<img src="{{ dynamic_image(null, true, null, null, 'art/special') }}" alt="Special Art">
+<!-- Get a random image from a specific folder on S3: -->
+<img src="{{ dynamic_image('random', true, null, 's3', 'custom-folder') }}" alt="Custom Folder Art">
 ```
 
 Or in PHP:
@@ -43,6 +47,14 @@ $relative = dynamic_image(null, false, 'compress,width=1200,blur=5');
 // Get an image from a different disk (e.g., S3):
 $imageUrl = dynamic_image(null, true, null, 's3');
 // https://your-s3-bucket-url/art/Art01.avif
+
+// Get an image from a specific folder (relative to disk root):
+$imageUrl = dynamic_image(null, true, null, null, 'art/special');
+// https://your-app.test/images/art/special/Art01.avif
+
+// Get a random image from a specific folder on S3:
+$imageUrl = dynamic_image('random', true, null, 's3', 'custom-folder');
+// https://your-s3-bucket-url/custom-folder/Art01.avif
 ```
 
 ### Overriding the Storage Disk
@@ -66,15 +78,16 @@ This global function returns a path or URL to an image, selected according to yo
 
 **Signature:**
 ```php
-dynamic_image($mode = null, $asUrl = true, $options = null, $disk = null)
+dynamic_image($mode = null, $asUrl = true, $options = null, $disk = null, $specificFolder = null)
 ```
 
-| Parameter | Type        | Default | Meaning/Effect                                                                   |
-|-----------|-------------|---------|---------------------------------------------------------------------------------|
-| `$mode`   | string/null | null    | `'random'`, `'timed'`, or `null` for config default. Controls image selection.   |
-| `$asUrl`  | bool        | true    | If true, returns asset() URL. If false, returns relative path.                   |
-| `$options`| string/null | null    | If set, inserts options after the first folder in the path or URL.               |
-| `$disk`   | string/null | null    | Filesystem disk to use (e.g., `'public'`, `'s3'`). Overrides config if set.      |
+| Parameter         | Type        | Default | Meaning/Effect                                                                   |
+|-------------------|-------------|---------|---------------------------------------------------------------------------------|
+| `$mode`           | string/null | null    | `'random'`, `'timed'`, or `null` for config default. Controls image selection.   |
+| `$asUrl`          | bool        | true    | If true, returns asset() URL. If false, returns relative path.                   |
+| `$options`        | string/null | null    | If set, inserts options after the first folder in the path or URL.               |
+| `$disk`           | string/null | null    | Filesystem disk to use (e.g., `'public'`, `'s3'`). Overrides config if set.      |
+| `$specificFolder` | string/null | null    | If set, fetches images only from this folder (relative to disk root).            |
 
 **Parameter Details:**
 - **`$mode`**: Controls how the image is selected.
@@ -85,6 +98,7 @@ dynamic_image($mode = null, $asUrl = true, $options = null, $disk = null)
 
 - **`$asUrl`**: If `true` (default), returns a full asset() URL (e.g., `https://your-app.test/images/art/Art01.avif`). If `false`, returns just the relative path (e.g., `images/art/Art01.avif`).
 - **`$options`**: If provided, inserts this string after the first folder in the path (e.g., `images/compress,width=1200/art/Art01.avif`). Useful for image processing/CDN tools.
+- **`$specificFolder`**: If provided, only images from this folder (relative to the selected disk root) are considered. For example, `'art/special'` will look in the `art/special` folder inside the disk.
 
 **Examples:**
 ```php
@@ -113,6 +127,10 @@ $imageUrl = dynamic_image(null, true, null, 's3');
 
 // Use the 'local' disk for timed mode
 $imageUrl = dynamic_image('timed', false, null, 'local');
+
+// Random image from a specific folder
+dynamic_image('random', true, null, null, 'art/special');
+// → https://your-app.test/images/art/special/Art01.avif
 ```
 
 ### Usage Examples
@@ -139,6 +157,14 @@ $imageUrl = dynamic_image('random', true, 'compress,width=1200,flip=horizontal,i
 // Using the default disk (e.g., 'public')
 $imagePath = dynamic_image('random', false, null);
 // Output: storage/art/Art02.avif
+
+// Get an image from a specific folder (relative to disk root):
+$imageUrl = dynamic_image(null, true, null, null, 'art/special');
+// Output: https://your-app.test/images/art/special/Art01.avif
+
+// Get a random image from a specific folder on S3:
+$imageUrl = dynamic_image('random', true, null, 's3', 'custom-folder');
+// Output: https://your-s3-bucket-url/custom-folder/Art01.avif
 ```
 
 **Note:**
