@@ -115,6 +115,37 @@ $imageUrl = dynamic_image(null, true, null, 's3');
 $imageUrl = dynamic_image('timed', false, null, 'local');
 ```
 
+### Usage Examples
+
+Below are practical examples showing the output for different arguments:
+
+```php
+// Get a random image URL from the 'media' disk
+$imageUrl = dynamic_image('random', true, null, 'media');
+// Output: https://yourdomain.com/media/art/Art02.avif
+
+// Get a random image relative path from the 'media' disk
+$imagePath = dynamic_image('random', false, null, 'media');
+// Output: media/art/Art02.avif
+
+// Get a random image relative path with options inserted
+$imagePath = dynamic_image('random', false, 'compress,width=1200,flip=horizontal,invert', 'media');
+// Output: media/compress,width=1200,flip=horizontal,invert/art/Art02.avif
+
+// Get a random image URL with options inserted
+$imageUrl = dynamic_image('random', true, 'compress,width=1200,flip=horizontal,invert', 'media');
+// Output: https://yourdomain.com/media/compress,width=1200,flip=horizontal,invert/art/Art02.avif
+
+// Using the default disk (e.g., 'public')
+$imagePath = dynamic_image('random', false, null);
+// Output: storage/art/Art02.avif
+```
+
+**Note:**
+- The disk root (e.g., `media/`, `storage/`) is always prepended to the returned path or URL, using a helper that extracts the root from the disk's base URL.
+- The `$options` parameter, if set, is inserted after the disk root segment for both relative paths and URLs.
+- This ensures consistency regardless of your disk configuration.
+
 ## Configuration
 
 - `folders`: Array of folders (relative to storage_path) to scan for images.
